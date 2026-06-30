@@ -51,7 +51,7 @@
 | 圖片格式不支援   | `UNSUPPORTED_FORMAT` | 目前只支援 JPG、PNG、WebP 格式 |
 | 圖片超過大小限制  | `FILE_TOO_LARGE`     | 圖片大小不可超過 5MB          |
 | 圖片損壞或無法讀取 | `INVALID_IMAGE`      | 無法讀取圖片，請重新選擇          |
-| 品質數值不正確   | `INVALID_QUALITY`    | 圖片品質設定不正確，請重新調整       |
+| 品質不是有效數字或超出 1～100 | `INVALID_QUALITY` | 圖片品質必須設定在 1 到 100 之間  |
 | 圖片處理失敗    | `PROCESSING_FAILED`  | 圖片處理失敗，請稍後再試          |
 | 無法連線到伺服器  | `NETWORK_ERROR`      | 無法連線至伺服器，請稍後再試        |
 | 系統發生其他錯誤  | `SERVER_ERROR`       | 系統發生錯誤，請稍後再試          |
@@ -110,13 +110,13 @@ Input buffer contains unsupported image format
 
 ---
 
-## 待確認
+## 已確認規格
 
-* [ ] 圖片大小上限是否為 5MB
-* [ ] 支援格式是否為 JPG、PNG、WebP
-* [ ] 圖片品質的設定範圍
-* [ ] 預設圖片品質是否為 75
-* [ ] 成功資料是否統一放在 `data`
-* [ ] 錯誤回應是否使用 `errorCode`
-* [ ] 顯示訊息欄位是否統一使用 `message`
-* [ ] 成功及錯誤訊息是否需要調整
+* [x] 圖片大小上限為 5MB
+* [x] 支援格式為 JPG、PNG、WebP
+* [x] 圖片品質的設定範圍1~100
+* [x] 預設圖片品質80
+* [x] 成功資料統一放在 `data`
+* [x] 錯誤回應使用 `errorCode`
+* [x] 顯示訊息欄位統一使用 `message`
+* [x] 成功及錯誤訊息暫不調整
