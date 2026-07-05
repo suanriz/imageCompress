@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>後端上傳測試</title>
+  </head>
+  <body>
+    <h2>🚀 後端圖片上傳測試網頁</h2>
+    <!-- 這個表單會直接把圖片和品質發射到你的 API 網址 -->
+    <form
+      action="http://localhost:3000/images/process"
+      method="POST"
+      enctype="multipart/form-data"
+    >
+      <label for="image">1. 選擇圖片：</label>
+      <input type="file" id="image" name="image" required />
+
+      <label for="quality">2. 輸入品質 (1-100)：</label>
+      <input type="number" id="quality" name="quality" value="85" required />
+
+      <button type="submit">送出到後端 API</button>
+    </form>
+  </body>
+</html>
