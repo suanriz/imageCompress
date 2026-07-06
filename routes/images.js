@@ -1,57 +1,43 @@
 const express = require("express");
+const fs = require("fs");
+const checkSingleImageAvailable = require("../middleware/checkSingleImageAvailable");
+const errorMessage = require("../config/errorMessages");
+const { defaultQuality } = require("../config/constants");
+
 const router = express.Router();
 
-// 測試用
-const multer = require("multer");
-// 測試用設定 multer：上傳的圖片要暫存到 uploads 資料夾
-const upload = multer({ dest: "uploads/" });
+router.post("/process", checkSingleImageAvailable, (req, res) => {
+  try {
+    //  取得絕對安全的 quality 參數（若前端沒傳，就用常數預設值）
+    const quality = req.body.quality
+      ? parseInt(req.body.quality, 10)
+      : defaultQuality;
 
-router.post("/process", upload.single("image"), (req, res) => {
-  // 防呆：檢查有沒有上傳檔案 (對應 NO_FILE)
-  if (!req.file) {
-    return res.status(400).json({
+    // 符合標準成功 JSON 回應格式
+    const successResponse = {
+      success: true,
+      message: "圖片處理完成",
+      data: {
+        originalSize: req.file.size, // 原始圖片大小 (bytes)
+        outputSize: Math.floor(req.file.size * 0.45), // 模擬處理後大小（目前先寫死）
+        savedPercent: 55.3, // 模擬減少的檔案大小比例
+        downloadUrl: "/output/result.webp", // 模擬處理後圖片的下載網址
+      },
+    };
+
+    // 暫存檔清理邏輯（避免未壓縮前的檔案爆硬碟）
+    fs.unlink(req.file.path, () => {});
+
+    //正式回應 200 成功
+    return res.status(200).json(successResponse);
+  } catch (error) {
+    console.error("API 路由發生未預期錯誤:", error);
+    return res.status(500).json({
       success: false,
-      errorCode: "NO_FILE",
-      message: "請先選擇圖片",
+      errorCode: "PROCESSING_FAILED",
+      message: "圖片處理失敗，請稍後再試",
     });
   }
-
-  // 防呆：檢查圖片是否超過 5MB (對應 FILE_TOO_LARGE)
-
-  const maxSize = 5 * 1024 * 1024; // 5MB 轉成位元組 (Bytes)
-  if (req.file.size > maxSize) {
-    return res.status(400).json({
-      success: false,
-      errorCode: "FILE_TOO_LARGE",
-      message: "圖片大小不可超過 5MB",
-    });
-  }
-
-  // 防呆：檢查圖片品質
-  //  從前端的請求主體 (req.body) 中，把 quality 拿出來
-  // 因為 app.js 有寫 app.use(express.json())，所以直接用 req.body 抓資料
-
-  const quality = req.body.quality ? parseInt(req.body.quality, 10) : 80;
-  // 防呆驗證：檢查 quality 是不是在 1~100 之間
-  if (isNaN(quality) || quality < 1 || quality > 100) {
-    return res.status(400).json({
-      success: false,
-      errorCode: "INVALID_QUALITY", // 錯誤代碼
-      message: "圖片品質必須設定在 1 到 100 之間", // 提示訊息
-    });
-  }
-
-  //  如果檢查沒問題，就順利過關
-  res.json({
-    success: true,
-    message: "圖片與參數皆成功通過 API 驗證！",
-    debugInfo: {
-      originalname: req.file.originalname, // 圖片原名
-      mimetype: req.file.mimetype, // 檔案格式
-      sizeBytes: req.file.size, // 檔案大小
-      qualitySetting: quality, // 品質設定
-    },
-  });
 });
 
 module.exports = router;
