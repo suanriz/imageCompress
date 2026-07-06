@@ -108,15 +108,3 @@ Input buffer contains unsupported image format
 
 錯誤訊息應清楚說明發生原因，並讓使用者知道接下來可以怎麼處理。
 
----
-
-## 已確認規格
-
-* [x] 圖片大小上限為 5MB
-* [x] 支援格式為 JPG、PNG、WebP
-* [x] 圖片品質的設定範圍1~100
-* [x] 預設圖片品質80
-* [x] 成功資料統一放在 `data`
-* [x] 錯誤回應使用 `errorCode`
-* [x] 顯示訊息欄位統一使用 `message`
-* [x] 成功及錯誤訊息暫不調整
