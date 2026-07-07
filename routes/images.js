@@ -17,7 +17,7 @@ router.post('/process', checkSingleImageAvailable, async (req, res) => {
 
   try {
     // sharp 壓縮
-    const buf = fs.readFileSync(req.file.path);
+    const buf = await fs.promises.readFile(req.file.path);
     const compressedImage = await processImage(buf, outputDir, {
       changeType: req.body.changeType,
       quality: Number(req.body.quality ?? defaultQuality),
