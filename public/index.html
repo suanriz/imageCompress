@@ -3,40 +3,98 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>圖片壓縮串接測試</title>
+    <title>⚡ ImageCompress - 高效圖片壓縮工坊</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- 引入 Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.9/dist/axios.min.js"></script>
   </head>
   <body>
-    <h2>🚀 圖片壓縮與轉檔 — 前端串接實驗室</h2>
+    <div class="container">
+      <h2>⚡ ImageCompress</h2>
+      <div class="subtitle">ImageCompress - 高效圖片壓縮工坊</div>
 
-    <!-- 1. 表單區：注意！我們移除了傳統的 action，改用 id 讓 JavaScript 來接管 -->
-    <form id="uploadForm">
-      <label>選擇圖片：</label>
-      <input type="file" id="imageInput" required /><br /><br />
+      <form id="uploadForm">
+        <div class="form-group">
+          <label for="imageInput">1. 選擇要壓縮的圖片</label>
+          <input
+            type="file"
+            id="imageInput"
+            accept="image/jpeg,image/png,image/webp"
+            required
+          />
+        </div>
 
-      <label>輸入品質 (1-100)：</label>
-      <input type="number" id="qualityInput" value="85" required /><br /><br />
+        <div class="form-group">
+          <label for="qualityInput">2. 設定壓縮品質</label>
+          <input type="range" id="qualityInput" min="1" max="100" value="80" />
+          <div class="quality-display">
+            <span>品質等級：</span>
+            <span class="quality-value" id="qualityValue">80</span>
+          </div>
+        </div>
 
-      <button type="submit">開始壓縮圖片</button>
-    </form>
+        <button type="submit" id="submitBtn">開始壓縮圖片</button>
+      </form>
 
-    <hr />
+      <div id="resultArea" class="hidden-section">
+        <hr />
+        <div class="result-card">
+          <div class="result-header">
+            <div>
+              <h3>🎉 圖片壓縮完成</h3>
+              <div class="result-subtitle">
+                已產生可下載的 WebP 檔案，以下是本次處理摘要。
+              </div>
+            </div>
+            <div class="result-badge">Ready to download</div>
+          </div>
 
-    <!-- 2. 【新增】前台結果區：原本是隱藏的，等後端成功回傳後，用 JS 把資料塞進這裡 -->
-    <div id="resultArea" style="display: none">
-      <h3>🎉 處理完成！</h3>
-      <p>原始大小：<span id="origSize">0</span> bytes</p>
-      <p>壓縮後大小：<span id="outSize">0</span> bytes</p>
-      <p>節省比例：<span id="savedPercent">0</span> %</p>
-      <a id="downloadLink" href="#" download>📥 點我下載 WebP 圖片</a>
+          <div class="result-hero">
+            <div class="hero-score">
+              <span class="hero-score-value" id="savedPercent">0</span>
+              <span class="hero-score-label">SAVED</span>
+            </div>
+            <div class="hero-copy">
+              <strong>體積節省比例</strong>
+              <p>
+                這次壓縮可明顯降低圖片體積，保留足夠畫質，同時加快傳輸與載入速度。
+              </p>
+            </div>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric-card">
+              <span class="metric-label">原始大小</span>
+              <span class="metric-value" id="origSize">0 bytes</span>
+              <span class="metric-note">上傳前檔案容量</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">處理後大小</span>
+              <span class="metric-value" id="outSize">0 bytes</span>
+              <span class="metric-note">壓縮後輸出容量</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">輸出格式</span>
+              <span class="metric-value">WebP</span>
+              <span class="metric-note">適合網頁傳輸</span>
+            </div>
+          </div>
+
+          <a id="downloadLink" class="download-btn" href="#" download
+            >📥 立即下載 WebP 檔案</a
+          >
+        </div>
+      </div>
+
+      <div id="errorArea" class="hidden-section">
+        <hr />
+        <div class="error-card">
+          <strong>❌ 觸發後端攔截機制：</strong>
+          <p id="errorMessage" class="error-message"></p>
+        </div>
+      </div>
     </div>
 
-    <!-- 3. 【新增】錯誤提示區：當後端噴 errorCode 時，顯示在這裡 -->
-    <div id="errorArea" style="display: none; color: red">
-      <h3>❌ 發生錯誤！</h3>
-      <p id="errorMessage"></p>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="main.js"></script>
   </body>
 </html>

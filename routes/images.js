@@ -31,13 +31,16 @@ router.post('/process', checkSingleImageAvailable, async (req, res) => {
     // 刪除暫存檔
     fs.unlink(req.file.path, () => {});
     return res.status(200).json({
-      filename: compressedImage.filename,
-      originalSize,
-      outputSize,
-      savedPercent,
-      format: compressedImage.format,
-      previewUrl: compressedImage.filePath,
-      downloadUrl: compressedImage.filePath
+      success: true,
+      data: {
+        filename: compressedImage.filename,
+        originalSize,
+        outputSize,
+        savedPercent,
+        format: compressedImage.format,
+        previewUrl: compressedImage.filePath,
+        downloadUrl: compressedImage.filePath
+      }
     });
   } catch (error) {
     fs.unlink(req.file.path, () => {});
