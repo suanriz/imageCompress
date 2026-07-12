@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>⚡ ImageCompress - 高效圖片壓縮工坊</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- 引入 Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.9/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h2>⚡ ImageCompress</h2>
+      <div class="subtitle">ImageCompress - 高效圖片壓縮工坊</div>
+
+      <form id="uploadForm">
+        <div class="form-group">
+          <label for="imageInput">1. 選擇要壓縮的圖片</label>
+          <input
+            type="file"
+            id="imageInput"
+            accept="image/jpeg,image/png,image/webp"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="qualityInput">2. 設定壓縮品質</label>
+          <input type="range" id="qualityInput" min="1" max="100" value="80" />
+          <div class="quality-display">
+            <span>品質等級：</span>
+            <span class="quality-value" id="qualityValue">80</span>
+          </div>
+        </div>
+
+        <button type="submit" id="submitBtn">開始壓縮圖片</button>
+      </form>
+
+      <div id="resultArea" class="hidden-section">
+        <hr />
+        <div class="result-card">
+          <div class="result-header">
+            <div>
+              <h3>🎉 圖片壓縮完成</h3>
+              <div class="result-subtitle">
+                已產生可下載的 WebP 檔案，以下是本次處理摘要。
+              </div>
+            </div>
+            <div class="result-badge">Ready to download</div>
+          </div>
+
+          <div class="result-hero">
+            <div class="hero-score">
+              <span class="hero-score-value" id="savedPercent">0</span>
+              <span class="hero-score-label">SAVED</span>
+            </div>
+            <div class="hero-copy">
+              <strong>體積節省比例</strong>
+              <p>
+                這次壓縮可明顯降低圖片體積，保留足夠畫質，同時加快傳輸與載入速度。
+              </p>
+            </div>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric-card">
+              <span class="metric-label">原始大小</span>
+              <span class="metric-value" id="origSize">0 bytes</span>
+              <span class="metric-note">上傳前檔案容量</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">處理後大小</span>
+              <span class="metric-value" id="outSize">0 bytes</span>
+              <span class="metric-note">壓縮後輸出容量</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">輸出格式</span>
+              <span class="metric-value">WebP</span>
+              <span class="metric-note">適合網頁傳輸</span>
+            </div>
+          </div>
+
+          <div id="previewArea" class="preview-panel hidden-section">
+            <div class="preview-title">WebP 預覽</div>
+            <img
+              id="previewImage"
+              class="preview-image"
+              src=""
+              alt="壓縮後 WebP 預覽"
+              loading="lazy"
+            />
+          </div>
+
+          <a id="downloadLink" class="download-btn" href="#" download
+            >📥 立即下載 WebP 檔案</a
+          >
+        </div>
+      </div>
+
+      <div id="errorArea" class="hidden-section">
+        <hr />
+        <div class="error-card">
+          <strong>❌ 觸發後端攔截機制：</strong>
+          <p id="errorMessage" class="error-message"></p>
+        </div>
+      </div>
+    </div>
+
+    <script src="main.js"></script>
+  </body>
+</html>
