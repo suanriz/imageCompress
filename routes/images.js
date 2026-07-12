@@ -27,6 +27,7 @@ router.post('/process', checkSingleImageAvailable, async (req, res) => {
     const outputSize = compressedImage.size;
     const originalSize = req.file.size;
     const savedPercent = calculateSavedPercent(originalSize, outputSize);
+    const publicFilePath = `/${compressedImage.filePath.replace(/^\/+/, '')}`;
 
     // 刪除暫存檔
     fs.unlink(req.file.path, () => {});
@@ -38,8 +39,8 @@ router.post('/process', checkSingleImageAvailable, async (req, res) => {
         outputSize,
         savedPercent,
         format: compressedImage.format,
-        previewUrl: compressedImage.filePath,
-        downloadUrl: compressedImage.filePath
+        previewUrl: publicFilePath,
+        downloadUrl: publicFilePath
       }
     });
   } catch (error) {

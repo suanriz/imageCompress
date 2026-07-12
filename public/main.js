@@ -5,6 +5,8 @@ const qualityInput = document.getElementById('qualityInput');
 const qualityValue = document.getElementById('qualityValue');
 const submitBtn = document.getElementById('submitBtn');
 const resultArea = document.getElementById('resultArea');
+const previewArea = document.getElementById('previewArea');
+const previewImage = document.getElementById('previewImage');
 const container = document.querySelector('.container');
 const origSize = document.getElementById('origSize');
 const outSize = document.getElementById('outSize');
@@ -19,6 +21,10 @@ qualityInput.addEventListener('input', (e) => {
 
 uploadForm.addEventListener('submit', async function (event) {
   event.preventDefault();
+
+  // 避免請求期間殘留上一次預覽
+  previewImage.src = '';
+  previewArea.classList.add(resultAreaClass);
 
   const formData = new FormData();
   formData.append('image', imageInput.files[0]);
@@ -51,6 +57,8 @@ uploadForm.addEventListener('submit', async function (event) {
       outSize.innerText = `${outputSizeFormatted} bytes`;
       savedPercent.innerText = `${savedPercentValue}%`;
       downloadLink.href = result.data.downloadUrl;
+      previewImage.src = result.data.previewUrl;
+      previewArea.classList.remove(resultAreaClass);
 
       resultArea.classList.remove(resultAreaClass);
       container.classList.add('has-result');
@@ -64,6 +72,8 @@ uploadForm.addEventListener('submit', async function (event) {
     }
 
     alert('❌ 錯誤\n\n' + errorMsg);
+    resultArea.classList.add(resultAreaClass);
+    container.classList.remove('has-result');
   } finally {
     // 恢復按鈕狀態
     submitBtn.disabled = false;
