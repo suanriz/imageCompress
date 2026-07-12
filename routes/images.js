@@ -12,7 +12,7 @@ const router = express.Router();
 fs.mkdirSync(outputDir, { recursive: true });
 
 router.post('/process', checkSingleImageAvailable, async (req, res) => {
-  // multer 產生的隨機檔名 + 原始檔名
+  // multer 產生的隨機檔名
   const newFileName = req.file.filename.slice(0, 15);
 
   try {
@@ -30,7 +30,12 @@ router.post('/process', checkSingleImageAvailable, async (req, res) => {
     const publicFilePath = `/${compressedImage.filePath.replace(/^\/+/, '')}`;
 
     // 刪除暫存檔
-    fs.unlink(req.file.path, () => {});
+    fs.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error('刪除暫存檔失敗:', req.file.path, err);
+      }
+    });
+
     return res.status(200).json({
       success: true,
       data: {
@@ -44,7 +49,12 @@ router.post('/process', checkSingleImageAvailable, async (req, res) => {
       }
     });
   } catch (error) {
-    fs.unlink(req.file.path, () => {});
+    fs.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error('刪除暫存檔失敗:', req.file.path, err);
+      }
+    });
+
     if (error.message === '不支援此圖片格式') {
       return res.status(400).json({
         success: false,
