@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 const checkSingleImageAvailable = require('../middleware/checkSingleImageAvailable');
 const errorMessage = require('../config/errorMessages');
 const processImage = require('../utils/imageProcessor');
@@ -24,10 +25,34 @@ router.post('/process', checkSingleImageAvailable, async (req, res) => {
       filename: newFileName
     });
 
-    const outputSize = compressedImage.size;
     const originalSize = req.file.size;
+    const originalFormat = req.file.mimetype.replace('image/', '');
+    const outputSize = compressedImage.size;
     const savedPercent = calculateSavedPercent(originalSize, outputSize);
     const publicFilePath = `/${compressedImage.filePath.replace(/^\/+/, '')}`;
+
+    // 壓縮後檔案變大，並且未轉檔，則傳回原始檔案
+    if (savedPercent < 0 && compressedImage.format === originalFormat) {
+      const filename = `${newFileName}.${originalFormat}`;
+
+      await fs.promises.rename(
+        req.file.path,
+        path.posix.join(outputDir, filename)
+      );
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          filename,
+          originalSize,
+          outputSize: originalSize,
+          savedPercent: 0,
+          format: originalFormat,
+          previewUrl: publicFilePath,
+          downloadUrl: publicFilePath
+        }
+      });
+    }
 
     // 刪除暫存檔
     fs.unlink(req.file.path, (err) => {
