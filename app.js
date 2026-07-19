@@ -1,8 +1,12 @@
+const path = require('path');
+
 const express = require('express');
 const cors = require('cors');
-const app = express();
+
 const imagesRoute = require('./routes/images');
-const path = require('path');
+const registerAllJobs = require('./jobs');
+
+const app = express();
 
 app.use(cors());
 app.use(express.json());
@@ -17,5 +21,6 @@ app.use((req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, () => {
+  registerAllJobs()
   console.log(`Server listening on http://localhost:${PORT}`);
 });
