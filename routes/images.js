@@ -1,7 +1,6 @@
 const express = require('express');
 const fs = require('fs');
-const path = require('path');
-const checkSingleImageAvailable = require('../middleware/checkSingleImageAvailable');
+const checkImagesAvailable = require('../middleware/checkImagesAvailable');
 const errorMessage = require('../config/errorMessages');
 const processImage = require('../utils/imageProcessor');
 const { calculateSavedPercent } = require('../utils/imageUtils');
@@ -13,91 +12,78 @@ const router = express.Router();
 // 建立輸出資料夾
 fs.mkdirSync(outputDir, { recursive: true });
 
-router.post('/process', checkSingleImageAvailable, async (req, res) => {
-  // multer 產生的隨機檔名
-  const newFileName = req.file.filename.slice(0, 15);
+router.post('/process', checkImagesAvailable, async (req, res) => {
+  const quality = Number(req.body.quality ?? defaultQuality);
+  const changeType = req.body.changeType;
 
-  try {
-    // sharp 壓縮
-    const buf = await fs.promises.readFile(req.file.path);
-    const compressedImage = await processImage(buf, outputDir, {
-      changeType: req.body.changeType,
-      quality: Number(req.body.quality ?? defaultQuality),
-      filename: newFileName
-    });
+  // 對每張圖片並行壓縮，各自獨立捕捉錯誤
+  const tasks = req.files.map(async (file) => {
+    // multer 產生的隨機檔名取前 15 碼作為輸出檔名
+    const newFileName = file.filename.slice(0, 15);
 
-    const originalSize = req.file.size;
-    const originalFormat = req.file.mimetype.replace('image/', '');
-    const outputSize = compressedImage.size;
-    const savedPercent = calculateSavedPercent(originalSize, outputSize);
-    const publicFilePath = `/${compressedImage.filePath.replace(/^\/+/, '')}`;
+    try {
+      const buf = await fs.promises.readFile(file.path);
+      const compressedImage = await processImage(buf, outputDir, {
+        changeType,
+        quality,
+        filename: newFileName
+      });
 
-    // 壓縮後檔案變大，並且未轉檔，則傳回原始檔案
-    if (savedPercent < 0 && compressedImage.format === originalFormat) {
-      const filename = `${newFileName}.${originalFormat}`;
+      const outputSize = compressedImage.size;
+      const originalSize = file.size;
+      const savedPercent = calculateSavedPercent(originalSize, outputSize);
+      const publicFilePath = `/${compressedImage.filePath.replace(/^\/+/, '')}`;
 
-      await fs.promises.rename(
-        req.file.path,
-        path.posix.join(outputDir, filename)
-      );
+      fs.unlink(file.path, () => {});
 
-      return res.status(200).json({
+      return {
+        originalName: file.originalname,
         success: true,
         data: {
-          filename,
+          filename: compressedImage.filename,
           originalSize,
-          outputSize: originalSize,
-          savedPercent: 0,
-          format: originalFormat,
-          previewUrl: publicFilePath,
+          outputSize,
+          savedPercent,
+          format: compressedImage.format,
           downloadUrl: publicFilePath
         }
-      });
-    }
+      };
+    } catch (error) {
+      fs.unlink(file.path, () => {});
 
-    // 刪除暫存檔
-    fs.unlink(req.file.path, (err) => {
-      if (err) {
-        console.error('刪除暫存檔失敗:', req.file.path, err);
-      }
-    });
-    fs.unlink(req.file.path, () => {});
-    // 紀錄檔案資料，以便後續移除
-    fileStore.addFileData(compressedImage.filename)
+      const isUnsupported =
+        error.message === '不支援此圖片格式';
 
-    return res.status(200).json({
-      success: true,
-      data: {
-        filename: compressedImage.filename,
-        originalSize,
-        outputSize,
-        savedPercent,
-        format: compressedImage.format,
-        previewUrl: publicFilePath,
-        downloadUrl: publicFilePath
-      }
-    });
-  } catch (error) {
-    fs.unlink(req.file.path, (err) => {
-      if (err) {
-        console.error('刪除暫存檔失敗:', req.file.path, err);
-      }
-    });
-
-    if (error.message === '不支援此圖片格式') {
-      return res.status(400).json({
+      return {
+        originalName: file.originalname,
         success: false,
-        errorCode: 'UNSUPPORTED_FORMAT',
-        message: errorMessage.UNSUPPORTED_FORMAT
-      });
+        errorCode: isUnsupported ? 'UNSUPPORTED_FORMAT' : 'INVALID_IMAGE',
+        message: isUnsupported
+          ? errorMessage.UNSUPPORTED_FORMAT
+          : errorMessage.INVALID_IMAGE
+      };
     }
-    // sharp 其他錯誤(例如檔案損毀)
-    return res.status(400).json({
-      success: false,
-      errorCode: 'INVALID_IMAGE',
-      message: errorMessage.INVALID_IMAGE
-    });
-  }
+  });
+
+  // 將 middleware 過濾掉的不合法格式檔案也加入失敗清單
+  const rejectedResults = (req.rejectedFiles || []).map((originalName) => ({
+    originalName,
+    success: false,
+    errorCode: 'UNSUPPORTED_FORMAT',
+    message: errorMessage.UNSUPPORTED_FORMAT
+  }));
+
+  const results = [...(await Promise.all(tasks)), ...rejectedResults];
+  const successCount = results.filter((r) => r.success).length;
+  const failCount = results.length - successCount;
+
+  return res.status(200).json({
+    success: true,
+    total: results.length,
+    successCount,
+    failCount,
+    results
+  });
 });
 
 module.exports = router;
