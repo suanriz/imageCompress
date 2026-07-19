@@ -5,6 +5,7 @@ const errorMessage = require('../config/errorMessages');
 const processImage = require('../utils/imageProcessor');
 const { calculateSavedPercent } = require('../utils/imageUtils');
 const { defaultQuality, outputDir } = require('../config/constants');
+const fileStore = require('../service/fileStore')
 
 const router = express.Router();
 
