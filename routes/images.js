@@ -6,6 +6,7 @@ const errorMessage = require('../config/errorMessages');
 const processImage = require('../utils/imageProcessor');
 const { calculateSavedPercent } = require('../utils/imageUtils');
 const { defaultQuality, outputDir } = require('../config/constants');
+const fileStore = require('../service/fileStore')
 
 const router = express.Router();
 
@@ -60,6 +61,9 @@ router.post('/process', checkSingleImageAvailable, async (req, res) => {
         console.error('刪除暫存檔失敗:', req.file.path, err);
       }
     });
+    fs.unlink(req.file.path, () => {});
+    // 紀錄檔案資料，以便後續移除
+    fileStore.addFileData(compressedImage.filename)
 
     return res.status(200).json({
       success: true,
