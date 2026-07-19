@@ -7,7 +7,7 @@ const lockfile = require('proper-lockfile');
 const { outputDir } = require('../config/constants');
 
 class FileStore {
-    #MAX_RETENTION_MS = 1000;
+    #MAX_RETENTION_MS = 2 * 60 * 60 * 1000;
 
     constructor(dbPath = path.join(__dirname, '../data/fileStore.json')) {
         this.dbPath = dbPath;
