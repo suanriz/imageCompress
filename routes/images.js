@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 const checkSingleImageAvailable = require('../middleware/checkSingleImageAvailable');
 const errorMessage = require('../config/errorMessages');
 const processImage = require('../utils/imageProcessor');
@@ -13,7 +14,7 @@ const router = express.Router();
 fs.mkdirSync(outputDir, { recursive: true });
 
 router.post('/process', checkSingleImageAvailable, async (req, res) => {
-  // multer 產生的隨機檔名 + 原始檔名
+  // multer 產生的隨機檔名
   const newFileName = req.file.filename.slice(0, 15);
 
   try {
@@ -25,12 +26,41 @@ router.post('/process', checkSingleImageAvailable, async (req, res) => {
       filename: newFileName
     });
 
-    const outputSize = compressedImage.size;
     const originalSize = req.file.size;
+    const originalFormat = req.file.mimetype.replace('image/', '');
+    const outputSize = compressedImage.size;
     const savedPercent = calculateSavedPercent(originalSize, outputSize);
     const publicFilePath = `/${compressedImage.filePath.replace(/^\/+/, '')}`;
 
+    // 壓縮後檔案變大，並且未轉檔，則傳回原始檔案
+    if (savedPercent < 0 && compressedImage.format === originalFormat) {
+      const filename = `${newFileName}.${originalFormat}`;
+
+      await fs.promises.rename(
+        req.file.path,
+        path.posix.join(outputDir, filename)
+      );
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          filename,
+          originalSize,
+          outputSize: originalSize,
+          savedPercent: 0,
+          format: originalFormat,
+          previewUrl: publicFilePath,
+          downloadUrl: publicFilePath
+        }
+      });
+    }
+
     // 刪除暫存檔
+    fs.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error('刪除暫存檔失敗:', req.file.path, err);
+      }
+    });
     fs.unlink(req.file.path, () => {});
     // 紀錄檔案資料，以便後續移除
     fileStore.addFileData(compressedImage.filename)
@@ -48,7 +78,12 @@ router.post('/process', checkSingleImageAvailable, async (req, res) => {
       }
     });
   } catch (error) {
-    fs.unlink(req.file.path, () => {});
+    fs.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error('刪除暫存檔失敗:', req.file.path, err);
+      }
+    });
+
     if (error.message === '不支援此圖片格式') {
       return res.status(400).json({
         success: false,
