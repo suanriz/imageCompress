@@ -32,6 +32,33 @@ router.post('/process', checkImagesAvailable, async (req, res) => {
       const outputSize = compressedImage.size;
       const originalSize = file.size;
       const savedPercent = calculateSavedPercent(originalSize, outputSize);
+
+      // 壓縮後檔案變大，並且未轉檔，則傳回原始檔案
+      if (savedPercent < 0 && !changeType) {
+        // 刪除已產生的壓縮輸出檔
+        fs.unlink(compressedImage.filePath, () => {});
+
+        // 將原始暫存檔移至 outputDir
+        const originalFilename = `${newFileName}.${compressedImage.format}`;
+        const originalOutputPath = path.posix.join(outputDir, originalFilename);
+        await fs.promises.rename(file.path, originalOutputPath);
+
+        const publicFilePath = `/${originalOutputPath.replace(/^\/+/, '')}`;
+
+        return {
+          originalName: file.originalname,
+          success: true,
+          data: {
+            filename: originalFilename,
+            originalSize,
+            outputSize: originalSize,
+            savedPercent: 0,
+            format: compressedImage.format,
+            downloadUrl: publicFilePath
+          }
+        };
+      }
+
       const publicFilePath = `/${compressedImage.filePath.replace(/^\/+/, '')}`;
 
       fs.unlink(file.path, () => {});
