@@ -12,7 +12,30 @@ const origSize = document.getElementById('origSize');
 const outSize = document.getElementById('outSize');
 const savedPercent = document.getElementById('savedPercent');
 const downloadLink = document.getElementById('downloadLink');
+const feedbackModalElement = document.getElementById('feedbackModal');
+const feedbackModalLabel = document.getElementById('feedbackModalLabel');
+const feedbackModalBody = document.getElementById('feedbackModalBody');
+const feedbackModalHeader = feedbackModalElement.querySelector('.modal-header');
+const feedbackModalCloseBtn = feedbackModalElement.querySelector('.btn-close');
 const resultAreaClass = 'hidden-section';
+const feedbackModal = new bootstrap.Modal(feedbackModalElement);
+
+function showFeedbackModal(title, message, tone = 'success') {
+  feedbackModalLabel.innerText = title;
+  feedbackModalBody.innerHTML = message;
+
+  feedbackModalHeader.classList.remove('text-bg-success', 'text-bg-danger');
+  feedbackModalCloseBtn.classList.remove('btn-close-white');
+
+  if (tone === 'error') {
+    feedbackModalHeader.classList.add('text-bg-danger');
+  } else {
+    feedbackModalHeader.classList.add('text-bg-success');
+  }
+
+  feedbackModalCloseBtn.classList.add('btn-close-white');
+  feedbackModal.show();
+}
 
 // 質量滑塊實時更新
 qualityInput.addEventListener('input', (e) => {
@@ -45,11 +68,14 @@ uploadForm.addEventListener('submit', async function (event) {
       const outputSizeFormatted = result.data.outputSize.toLocaleString();
       const savedPercentValue = result.data.savedPercent;
 
-      alert(
-        `✅ 圖片壓縮成功\n\n` +
-          `原始大小: ${originalSizeFormatted} bytes\n` +
-          `處理後大小: ${outputSizeFormatted} bytes\n` +
-          `節省比例: ${savedPercentValue}%`
+      showFeedbackModal(
+        '✅ 圖片壓縮成功',
+        `
+          <p class="mb-2">原始大小: <strong>${originalSizeFormatted} bytes</strong></p>
+          <p class="mb-2">處理後大小: <strong>${outputSizeFormatted} bytes</strong></p>
+          <p class="mb-0">節省比例: <strong>${savedPercentValue}%</strong></p>
+        `,
+        'success'
       );
 
       // 更新 UI
@@ -71,7 +97,7 @@ uploadForm.addEventListener('submit', async function (event) {
       errorMsg = `[${result.errorCode}] ${result.message}`;
     }
 
-    alert('❌ 錯誤\n\n' + errorMsg);
+    showFeedbackModal('❌ 錯誤', `<p class="mb-0">${errorMsg}</p>`, 'error');
     resultArea.classList.add(resultAreaClass);
     container.classList.remove('has-result');
   } finally {

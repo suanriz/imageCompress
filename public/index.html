@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>⚡ ImageCompress - 高效圖片壓縮工坊</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
     <link rel="stylesheet" href="styles.css" />
     <!-- 引入 Axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios@1.7.9/dist/axios.min.js"></script>
@@ -40,12 +46,7 @@
         <hr />
         <div class="result-card">
           <div class="result-header">
-            <div>
-              <h3>🎉 圖片壓縮完成</h3>
-              <div class="result-subtitle">
-                已產生可下載的 WebP 檔案，以下是本次處理摘要。
-              </div>
-            </div>
+            <h3>🎉 壓縮完成</h3>
             <div class="result-badge">Ready to download</div>
           </div>
 
@@ -53,12 +54,6 @@
             <div class="hero-score">
               <span class="hero-score-value" id="savedPercent">0</span>
               <span class="hero-score-label">SAVED</span>
-            </div>
-            <div class="hero-copy">
-              <strong>體積節省比例</strong>
-              <p>
-                這次壓縮可明顯降低圖片體積，保留足夠畫質，同時加快傳輸與載入速度。
-              </p>
             </div>
           </div>
 
@@ -81,7 +76,6 @@
           </div>
 
           <div id="previewArea" class="preview-panel hidden-section">
-            <div class="preview-title">WebP 預覽</div>
             <img
               id="previewImage"
               class="preview-image"
@@ -106,6 +100,43 @@
       </div>
     </div>
 
+    <div
+      class="modal fade"
+      id="feedbackModal"
+      tabindex="-1"
+      aria-labelledby="feedbackModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="feedbackModalLabel">系統訊息</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" id="feedbackModalBody"></div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+            >
+              我知道了
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
     <script src="main.js"></script>
   </body>
 </html>
