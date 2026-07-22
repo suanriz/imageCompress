@@ -1,11 +1,13 @@
 const {
   allowImageTypes,
   maxImageMegabytes,
-  qualityRange
+  qualityRange,
+  maxBatchCount
 } = require('./constants');
 
 module.exports = {
-  NO_FILE: '請先選擇圖片',
+  NO_FILES: '請至少選擇一張圖片',
+  TOO_MANY_FILES: `一次最多上傳 ${maxBatchCount} 張圖片`,
   UNSUPPORTED_FORMAT: `目前只支援 ${allowImageTypes.join('、')} 格式`,
   FILE_TOO_LARGE: `圖片大小不可超過 ${maxImageMegabytes}MB`,
   INVALID_IMAGE: '無法讀取圖片，請重新選擇',

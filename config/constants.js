@@ -3,5 +3,6 @@ module.exports = {
   defaultQuality: 80,
   qualityRange: { min: 1, max: 100 },
   maxImageMegabytes: 5,
+  maxBatchCount: 10,
   outputDir: 'downloads/'
 };
