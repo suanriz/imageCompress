@@ -15,6 +15,10 @@ app.use('/downloads', express.static(path.join(__dirname, 'downloads')));
 
 app.use('/images', imagesRoute);
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'success', message: 'OK' });
+});
+
 app.use((req, res) => {
   res.status(404).json({ status: 'error', message: 'Page not found' });
 });
