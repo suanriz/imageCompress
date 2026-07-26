@@ -5,9 +5,9 @@ const errorMessage = require('../config/errorMessages');
 const processImage = require('../utils/imageProcessor');
 const { calculateSavedPercent } = require('../utils/imageUtils');
 const { defaultQuality, outputDir } = require('../config/constants');
-const fileStore = require('../service/fileStore')
 
 const router = express.Router();
+const path = require('path');
 
 // 建立輸出資料夾
 fs.mkdirSync(outputDir, { recursive: true });
@@ -54,7 +54,8 @@ router.post('/process', checkImagesAvailable, async (req, res) => {
             outputSize: originalSize,
             savedPercent: 0,
             format: compressedImage.format,
-            downloadUrl: publicFilePath
+            downloadUrl: publicFilePath,
+            previewUrl: publicFilePath
           }
         };
       }
@@ -72,14 +73,14 @@ router.post('/process', checkImagesAvailable, async (req, res) => {
           outputSize,
           savedPercent,
           format: compressedImage.format,
-          downloadUrl: publicFilePath
+          downloadUrl: publicFilePath,
+          previewUrl: publicFilePath
         }
       };
     } catch (error) {
       fs.unlink(file.path, () => {});
 
-      const isUnsupported =
-        error.message === '不支援此圖片格式';
+      const isUnsupported = error.message === '不支援此圖片格式';
 
       return {
         originalName: file.originalname,

@@ -15,88 +15,138 @@
     <script src="https://cdn.jsdelivr.net/npm/axios@1.7.9/dist/axios.min.js"></script>
   </head>
   <body>
-    <div class="container">
-      <h2>⚡ ImageCompress</h2>
-      <div class="subtitle">ImageCompress - 高效圖片壓縮工坊</div>
+    <div class="page-shell">
+      <div class="container">
+        <header class="page-heading">
+          <h1 class="app-title">
+            ⚡ ImageCompress
+            <span class="app-subtitle">高效圖片壓縮工坊</span>
+          </h1>
+        </header>
 
-      <form id="uploadForm">
-        <div class="form-group">
-          <label for="imageInput">1. 選擇要壓縮的圖片</label>
-          <input
-            type="file"
-            id="imageInput"
-            accept="image/jpeg,image/png,image/webp"
-            multiple
-            required
-          />
+        <div class="workspace-grid">
+          <section class="surface-card form-surface">
+            <div class="section-heading">
+              <h2>選擇圖片並設定輸出品質</h2>
+            </div>
+
+            <form id="uploadForm">
+              <div class="form-group">
+                <label for="imageInput">1. 選擇要壓縮的圖片</label>
+                <div class="file-dropzone">
+                  <input
+                    type="file"
+                    id="imageInput"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    required
+                  />
+                  <div class="dropzone-copy">
+                    <strong>拖曳圖片到這裡，或點擊挑選檔案</strong>
+                    <span>支援 JPEG、PNG、WebP</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>2. 選擇輸出格式（轉檔）</label>
+                <div
+                  class="btn-group format-group"
+                  role="group"
+                  aria-label="選擇輸出格式"
+                >
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    name="changeType"
+                    id="format-original"
+                    value=""
+                    checked
+                  />
+                  <label class="btn btn-outline-primary" for="format-original"
+                    >保持原格式</label
+                  >
+
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    name="changeType"
+                    id="format-jpeg"
+                    value="jpeg"
+                  />
+                  <label class="btn btn-outline-primary" for="format-jpeg"
+                    >JPG</label
+                  >
+
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    name="changeType"
+                    id="format-png"
+                    value="png"
+                  />
+                  <label class="btn btn-outline-primary" for="format-png"
+                    >PNG</label
+                  >
+
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    name="changeType"
+                    id="format-webp"
+                    value="webp"
+                  />
+                  <label class="btn btn-outline-primary" for="format-webp"
+                    >WebP</label
+                  >
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="qualityInput">3. 設定壓縮品質</label>
+                <input
+                  type="range"
+                  id="qualityInput"
+                  min="1"
+                  max="100"
+                  value="80"
+                />
+                <div class="quality-display">
+                  <span>品質等級</span>
+                  <span class="quality-value" id="qualityValue">80</span>
+                </div>
+              </div>
+
+              <button type="submit" id="submitBtn">開始壓縮圖片</button>
+            </form>
+          </section>
         </div>
 
-        <div class="form-group">
-          <label for="qualityInput">2. 設定壓縮品質</label>
-          <input type="range" id="qualityInput" min="1" max="100" value="80" />
-          <div class="quality-display">
-            <span>品質等級：</span>
-            <span class="quality-value" id="qualityValue">80</span>
-          </div>
-        </div>
-
-        <button type="submit" id="submitBtn">開始壓縮圖片</button>
-      </form>
-
-      <div id="resultArea" class="hidden-section">
-        <hr />
-        <div class="result-card">
-          <div class="result-header">
-            <h3>🎉 壓縮完成</h3>
-            <div class="result-badge">Ready to download</div>
-          </div>
-
-          <div class="result-hero">
-            <div class="hero-score">
-              <span class="hero-score-value" id="savedPercent">0</span>
-              <span class="hero-score-label">SAVED</span>
+        <div class="results-stack">
+          <div id="resultArea" class="hidden-section">
+            <div class="surface-card batch-summary">
+              <div class="batch-summary-header">
+                <h3>批量處理結果</h3>
+                <div class="batch-summary-actions">
+                  <span class="result-badge" id="batchStatusText">Ready</span>
+                  <button
+                    type="button"
+                    id="clearResultsBtn"
+                    class="btn btn-sm btn-outline-primary clear-results-btn"
+                  >
+                    清空全部
+                  </button>
+                </div>
+              </div>
+              <div class="batch-summary-metrics">
+                <span>總數 <strong id="batchTotalCount">0</strong></span>
+                <span>成功 <strong id="batchSuccessCount">0</strong></span>
+                <span>失敗 <strong id="batchFailCount">0</strong></span>
+              </div>
             </div>
+
+            <div id="resultList" class="result-list"></div>
           </div>
-
-          <div class="metric-grid">
-            <div class="metric-card">
-              <span class="metric-label">原始大小</span>
-              <span class="metric-value" id="origSize">0 bytes</span>
-              <span class="metric-note">上傳前檔案容量</span>
-            </div>
-            <div class="metric-card">
-              <span class="metric-label">處理後大小</span>
-              <span class="metric-value" id="outSize">0 bytes</span>
-              <span class="metric-note">壓縮後輸出容量</span>
-            </div>
-            <div class="metric-card">
-              <span class="metric-label">輸出格式</span>
-              <span class="metric-value">WebP</span>
-              <span class="metric-note">適合網頁傳輸</span>
-            </div>
-          </div>
-
-          <div id="previewArea" class="preview-panel hidden-section">
-            <img
-              id="previewImage"
-              class="preview-image"
-              src=""
-              alt="壓縮後 WebP 預覽"
-              loading="lazy"
-            />
-          </div>
-
-          <a id="downloadLink" class="download-btn" href="#" download
-            >📥 立即下載 WebP 檔案</a
-          >
-        </div>
-      </div>
-
-      <div id="errorArea" class="hidden-section">
-        <hr />
-        <div class="error-card">
-          <strong>❌ 觸發後端攔截機制：</strong>
-          <p id="errorMessage" class="error-message"></p>
         </div>
       </div>
     </div>
