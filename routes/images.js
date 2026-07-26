@@ -45,6 +45,9 @@ router.post('/process', checkImagesAvailable, async (req, res) => {
 
         const publicFilePath = `/${originalOutputPath.replace(/^\/+/, '')}`;
 
+        // 紀錄檔案資料，以便後續移除
+        fileStore.addFileData(compressedImage.originalFilename)
+
         return {
           originalName: file.originalname,
           success: true,
@@ -62,6 +65,9 @@ router.post('/process', checkImagesAvailable, async (req, res) => {
       const publicFilePath = `/${compressedImage.filePath.replace(/^\/+/, '')}`;
 
       fs.unlink(file.path, () => {});
+      
+      // 紀錄檔案資料，以便後續移除
+      fileStore.addFileData(compressedImage.filename)
 
       return {
         originalName: file.originalname,
