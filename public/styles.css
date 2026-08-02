@@ -427,23 +427,22 @@ input[type='range']::-moz-range-thumb {
   padding: 12px 14px 14px;
   display: grid;
   grid-template-columns: auto auto minmax(220px, 1fr) 104px;
-  grid-template-areas:
-    'header hero metrics preview'
-    'actions actions actions actions';
+  grid-template-areas: 'header hero metrics preview';
   gap: 10px 12px;
   align-items: center;
   box-shadow: 0 10px 25px -20px rgba(59, 94, 158, 0.28);
 }
 
 .result-card-actions {
-  grid-area: actions;
-  display: flex;
+  grid-area: preview;
+  display: inline-flex;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 4px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(201, 218, 242, 0.6);
+  margin-top: 6px;
+  padding-top: 0;
+  border-top: 0;
+  align-self: end;
 }
 
 .result-card-actions--single {
@@ -619,6 +618,10 @@ input[type='range']::-moz-range-thumb {
 
 .preview-panel {
   grid-area: preview;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   margin-top: 0;
   padding: 3px;
   background: #ffffff;

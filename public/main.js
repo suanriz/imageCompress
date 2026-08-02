@@ -13,6 +13,7 @@ const batchStatusText = document.getElementById('batchStatusText');
 const clearResultsBtn = document.getElementById('clearResultsBtn');
 const container = document.querySelector('.container');
 const feedbackModalElement = document.getElementById('feedbackModal');
+const downloadAllBtn = document.getElementById('clearResultsBtn');
 const feedbackModalLabel = document.getElementById('feedbackModalLabel');
 const feedbackModalBody = document.getElementById('feedbackModalBody');
 const feedbackModalHeader = feedbackModalElement.querySelector('.modal-header');
@@ -84,6 +85,30 @@ function resetBatchResults() {
   refreshBatchSummary();
 }
 
+function downloadAllSuccessfulResults() {
+  const successLinks = Array.from(
+    resultList.querySelectorAll(
+      '.result-card[data-result-type="success"] .result-card-action--download'
+    )
+  );
+
+  if (successLinks.length === 0) {
+    showFeedbackModal('ℹ️ 提示', '目前沒有可下載的成功結果');
+    return;
+  }
+
+  successLinks.forEach((link, index) => {
+    setTimeout(() => {
+      const clickEvent = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      });
+      link.dispatchEvent(clickEvent);
+    }, index * 120);
+  });
+}
+
 function appendResultCards(results) {
   const cardsHtml = results
     .map((item) =>
@@ -92,19 +117,6 @@ function appendResultCards(results) {
     .join('');
 
   resultList.insertAdjacentHTML('beforeend', cardsHtml);
-}
-
-function buildRemoveActionButton() {
-  return `
-    <button
-      type="button"
-      class="result-card-action result-card-action--remove"
-      aria-label="移除這張結果卡"
-      title="移除"
-    >
-      <span aria-hidden="true">×</span>
-    </button>
-  `;
 }
 
 function buildDownloadActionLink(downloadUrl) {
@@ -135,12 +147,13 @@ function buildResultActions({ downloadUrl = null, single = false } = {}) {
     ? 'result-card-actions result-card-actions--single'
     : 'result-card-actions';
 
-  return `
-    <div class="${actionsClass}">
-      ${downloadUrl ? buildDownloadActionLink(downloadUrl) : ''}
-      ${buildRemoveActionButton()}
-    </div>
-  `;
+  return downloadUrl
+    ? `
+      <div class="${actionsClass}">
+        ${buildDownloadActionLink(downloadUrl)}
+      </div>
+    `
+    : '';
 }
 
 function buildSuccessCard(item) {
@@ -300,36 +313,6 @@ uploadForm.addEventListener('submit', async function (event) {
   }
 });
 
-resultList.addEventListener('click', (event) => {
-  const closeButton = event.target.closest('.result-card-action--remove');
-
-  if (!closeButton) {
-    return;
-  }
-
-  const card = closeButton.closest('.result-card');
-  if (!card) {
-    return;
-  }
-
-  const resultType = card.dataset.resultType;
-  if (resultType === 'success') {
-    batchStats.success = Math.max(0, batchStats.success - 1);
-  } else {
-    batchStats.fail = Math.max(0, batchStats.fail - 1);
-  }
-
-  batchStats.total = Math.max(0, batchStats.total - 1);
-  card.remove();
-
-  if (batchStats.total === 0) {
-    resultArea.classList.add(resultAreaClass);
-    container.classList.remove('has-result');
-  }
-
-  refreshBatchSummary();
-});
-
 clearResultsBtn.addEventListener('click', () => {
-  resetBatchResults();
+  downloadAllSuccessfulResults();
 });
