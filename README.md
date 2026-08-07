@@ -57,7 +57,7 @@ ImageCompress 是一個使用 Node.js 與 Express 製作的圖片壓縮與轉檔
 
 ### Step 1：環境準備
 
-1.確認Node.js版本>=18 (建議20)
+請先確認電腦已安裝 Node.js，建議使用 Node.js 20.9.0 以上版本。
 
 ### Step 2：下載專案並安裝套件
 
@@ -92,7 +92,7 @@ http://localhost:3000
 ## 前台操作方式
 
 1. 開啟首頁
-2. 選擇一張或多張圖片
+2. 點選或拖曳上傳一張或多張圖片
 3. 選擇輸出格式
    - 壓縮：維持原格式並進行壓縮
    - JPG：轉換為 JPG
@@ -310,14 +310,10 @@ Body 請選擇 `form-data`，並依照測試情境填入 `images`、`changeType`
 目前不支援 GIF。  
 支援格式為 JPG、PNG、WebP。
 
-若上傳 GIF，會顯示：
+若上傳 GIF，系統會顯示格式不支援提示：
 
-```json
-{
-  "success": false,
-  "errorCode": "UNSUPPORTED_FORMAT",
-  "message": "目前只支援 JPG、PNG、WebP 格式"
-}
+```text
+目前只支援 JPG、PNG、WebP 格式
 ```
 
 ### Q3：一次可以上傳幾張圖片？
@@ -369,7 +365,7 @@ quality 範圍為 1～100。
 8. 查看單張圖片的預覽、格式與節省比例
 9. 下載單張圖片
 10. 使用「一鍵下載」下載所有成功處理的圖片
-11. 示範錯誤情境，例如上傳 GIF
+11. 示範錯誤情境，例如同時上傳 JPG 與 GIF
 12. 說明錯誤提示如何協助使用者理解問題
 
 ---
