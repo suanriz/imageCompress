@@ -23,7 +23,7 @@ app.use((req, res) => {
   res.status(404).json({ status: 'error', message: 'Page not found' });
 });
 
-const PORT = PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   registerAllJobs()
   console.log(`Server listening on http://localhost:${PORT}`);
