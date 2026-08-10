@@ -16,7 +16,10 @@ const {
 
 const uploadArray = multer({
   dest: 'uploads/',
-  limits: { fileSize: megabytesToBytes(maxImageMegabytes) }
+  limits: {
+    fileSize: megabytesToBytes(maxImageMegabytes),
+    files: maxBatchCount
+  }
 }).array('images', maxBatchCount); // 'images' 對應前端 FormData 欄位名
 
 function checkImagesAvailable(req, res, next) {
