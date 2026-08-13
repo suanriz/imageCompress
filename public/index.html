@@ -33,7 +33,7 @@
             <form id="uploadForm">
               <div class="form-group">
                 <label for="imageInput">1. 選擇要壓縮的圖片</label>
-                <div class="file-dropzone">
+                <div class="file-dropzone" id="fileDropzone">
                   <input
                     type="file"
                     id="imageInput"
@@ -42,8 +42,15 @@
                     required
                   />
                   <div class="dropzone-copy">
-                    <strong>拖曳圖片到這裡，或點擊挑選檔案</strong>
-                    <span>支援 JPEG、PNG、WebP</span>
+                    <strong id="dropzoneTitle"
+                      >拖曳圖片到這裡，或點擊挑選檔案</strong
+                    >
+                    <span id="dropzoneHint">支援 JPEG、PNG、WebP</span>
+                    <div
+                      class="dropzone-selected-files hidden"
+                      id="selectedFilesList"
+                      aria-live="polite"
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -129,6 +136,13 @@
                 <h3>批量處理結果</h3>
                 <div class="batch-summary-actions">
                   <span class="result-badge" id="batchStatusText">Ready</span>
+                  <button
+                    type="button"
+                    id="resetResultsBtn"
+                    class="btn btn-sm btn-outline-danger reset-results-btn"
+                  >
+                    清空結果
+                  </button>
                   <button
                     type="button"
                     id="clearResultsBtn"
