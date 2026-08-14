@@ -279,7 +279,11 @@ function refreshSelectedFilesDisplay() {
 }
 
 async function setSelectedFiles(files) {
-  const validation = await validateSelectedFiles(files);
+  const incomingFiles = Array.from(files || []);
+  const validation = await validateSelectedFiles([
+    ...selectedImageFiles,
+    ...incomingFiles
+  ]);
   selectedImageFiles = validation.validFiles;
   syncImageInputFiles(selectedImageFiles);
   refreshSelectedFilesDisplay();
